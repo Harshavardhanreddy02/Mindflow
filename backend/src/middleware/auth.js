@@ -1,0 +1,60 @@
+import { getAuthInstance } from "../config/firebase.js";
+
+export const authMiddleware = async (req, res, next) => {
+  try {
+    let token = null;
+
+    // Check for token in Authorization header first
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
+    // If no header token, check for cookie
+    else if (req.cookies && req.cookies.authToken) {
+      token = req.cookies.authToken;
+    }
+
+    if (!token) {
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "No valid authorization token provided",
+      });
+    }
+
+    const auth = getAuthInstance();
+
+    // Verify the Firebase ID token
+    const decodedToken = await auth.verifyIdToken(token);
+
+    // Add user info to request object
+    req.user = {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
+      name: decodedToken.name,
+      picture: decodedToken.picture,
+    };
+
+    next();
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+
+    if (error.code === "auth/id-token-expired") {
+      return res.status(401).json({
+        error: "Token expired",
+        message: "Please sign in again",
+      });
+    }
+
+    if (error.code === "auth/invalid-id-token") {
+      return res.status(401).json({
+        error: "Invalid token",
+        message: "Please sign in again",
+      });
+    }
+
+    return res.status(401).json({
+      error: "Unauthorized",
+      message: "Invalid authentication token",
+    });
+  }
+};
