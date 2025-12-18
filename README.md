@@ -60,19 +60,6 @@ MindFlow/
 - **MediaPipe** - Pose detection and tracking
 - **OpenCV** - Computer vision processing
 
-## 🚀 Quick Start
-
-
-
-   ```
-
-
-1. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-
-
-
 
 
 
