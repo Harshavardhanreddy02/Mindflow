@@ -121,14 +121,13 @@ server.listen(PORT, async () => {
     // Connect to MongoDB (for data storage)
     await connectMongoDB();
 
-    console.log(`🚀 MindFlow Backend Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-    console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
-    console.log(`🔥 Firebase: Authentication only`);
-    console.log(`🍃 MongoDB: Data storage`);
-    console.log(`🔌 WebSocket: Real-time communication enabled`);
-    console.log(`🤖 AI Chat: Gemini 2.0 Flash powered chatbot`);
+    console.log(` MindFlow Backend Server running on port ${PORT}`);
+    console.log(` Environment: ${process.env.NODE_ENV}`);
+    console.log(` Health check: http://localhost:${PORT}/health`);
+    console.log(` Firebase: Authentication only`);
+    console.log(` MongoDB: Data storage`);
+    console.log(` WebSocket: Real-time communication enabled`);
+    console.log(` AI Chat: Gemini 2.0 Flash powered chatbot`);
   } catch (error) {
     console.error("❌ Backend initialization failed:", error);
     process.exit(1);

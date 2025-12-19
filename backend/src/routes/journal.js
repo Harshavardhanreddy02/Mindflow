@@ -98,11 +98,6 @@ router.put(
 router.delete("/entries/:id", journalController.deleteEntry);
 router.get("/analytics", journalController.getAnalytics);
 
-// Speech-to-text route for journal entries
-router.post(
-  "/entries/speech",
-  upload.single("audio"),
-  journalController.createEntryFromSpeech
-);
+
 
 export default router;
