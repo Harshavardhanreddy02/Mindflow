@@ -11,14 +11,6 @@ const ExerciseCategorySelector = ({ onCategorySelect }) => {
       color: 'from-violet-500 to-purple-500',
       hoverColor: 'from-violet-600 to-purple-600'
     },
-    {
-      id: 'physical',
-      name: 'Physical Wellness',
-      description: 'Bicep curls, squats, and strength training',
-      icon: '💪',
-      color: 'from-emerald-500 to-teal-500',
-      hoverColor: 'from-emerald-600 to-teal-600'
-    }
   ]
 
   return (

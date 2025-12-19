@@ -24,7 +24,7 @@ const AICompanion = () => {
   const [transcription, setTranscription] = useState('');
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [supportedLanguages, setSupportedLanguages] = useState([]);
-  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
+  // const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [authToken, setAuthToken] = useState(null);
   const messagesEndRef = useRef(null);
@@ -539,32 +539,8 @@ const AICompanion = () => {
             {/* Voice Input Toggle */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                {/* <button
-                  onClick={toggleVoiceInput}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                    showVoiceInput 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  <Mic className="w-4 h-4" />
-                  <span>Voice Input</span>
-                </button> */}
-                
-                {showVoiceInput && (
-                  <div className="flex items-center space-x-2">
-                    <Languages className="w-4 h-4 text-gray-500" />
-                    <select
-                      value={selectedLanguage}
-                      onChange={(e) => setSelectedLanguage(e.target.value)}
-                      className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {supportedLanguages.map(lang => (
-                        <option key={lang} value={lang}>{lang}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+               
+                               
               </div>
               
               {isTranscribing && (
