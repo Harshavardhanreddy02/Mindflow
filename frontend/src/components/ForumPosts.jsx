@@ -458,9 +458,9 @@ const ForumPosts = () => {
                               className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                               disabled={isCreatingReply[post._id]}
                             />
-                            <label htmlFor={`anonymous-${post._id}`} className="text-sm text-slate-700">
+                            {/* <label htmlFor={`anonymous-${post._id}`} className="text-sm text-slate-700">
                               Reply anonymously
-                            </label>
+                            </label> */}
                           </div>
                           <div className="flex space-x-2">
                             <Button

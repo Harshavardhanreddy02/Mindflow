@@ -14,18 +14,9 @@ const Profile = () => {
     theme: 'light',
     privacy: 'friends'
   })
-  const [wellnessGoals, setWellnessGoals] = useState([])
-  const [achievements, setAchievements] = useState([])
   const [stats, setStats] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showAddGoalModal, setShowAddGoalModal] = useState(false)
-  const [newGoal, setNewGoal] = useState({
-    title: '',
-    description: '',
-    target: '',
-    unit: 'times',
-    priority: 'medium'
-  })
+ 
   const [recentActivity, setRecentActivity] = useState([])
   const [moodTrend, setMoodTrend] = useState([])
   const [activityDistribution, setActivityDistribution] = useState({})
@@ -36,39 +27,19 @@ const Profile = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
-    { id: 'goals', label: 'Goals', icon: Target },
-    { id: 'achievements', label: 'Achievements', icon: Award },
-    { id: 'settings', label: 'Settings', icon: Settings }
   ]
 
   const fetchProfileData = useCallback(async () => {
     try {
       if (!user) {
         console.warn('User not authenticated, cannot fetch profile data')
-        setWellnessGoals([])
-        setAchievements([])
+       
         setStats([])
         setIsLoading(false)
         return
       }
-
       const idToken = await user.getIdToken()
       
-      // Fetch wellness goals
-      const goalsResponse = await fetch(`${getApiBaseUrl()}/profile/wellness-goals`, {
-        headers: {
-          'Authorization': `Bearer ${idToken}`
-        }
-      })
-      
-      // Fetch achievements
-      const achievementsResponse = await fetch(`${getApiBaseUrl()}/profile/achievements`, {
-        headers: {
-          'Authorization': `Bearer ${idToken}`
-        }
-      })
-      
-      // Fetch user stats
       const statsResponse = await fetch(`${getApiBaseUrl()}/profile/stats`, {
         headers: {
           'Authorization': `Bearer ${idToken}`
@@ -124,11 +95,10 @@ const Profile = () => {
       })
       
       // Check if any response failed
-      if (!goalsResponse.ok || !achievementsResponse.ok || !statsResponse.ok || !preferencesResponse.ok || 
+      if ( !statsResponse.ok || !preferencesResponse.ok || 
           !moodTrendResponse.ok || !activityDistributionResponse.ok || !recentActivityResponse.ok || !journalResponse.ok || !aiResponse.ok || !exerciseResponse.ok) {
         console.warn('Backend server not running')
-        setWellnessGoals([])
-        setAchievements([])
+        
         setStats([])
         setJournalEntries([])
         setAiConversations([])
@@ -137,21 +107,19 @@ const Profile = () => {
         return
       }
       
-      const contentType = goalsResponse.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        console.warn('Backend server not running')
-        setWellnessGoals([])
-        setAchievements([])
-        setStats([])
-        setRecentActivity([])
-        setMoodTrend([])
-        setActivityDistribution({})
-        setIsLoading(false)
-        return
-      }
+      // const contentType = goalsResponse.headers.get('content-type')
+      // if (!contentType || !contentType.includes('application/json')) {
+      //   console.warn('Backend server not running')
+
+      //   setStats([])
+      //   setRecentActivity([])
+      //   setMoodTrend([])
+      //   setActivityDistribution({})
+      //   setIsLoading(false)
+      //   return
+      // }
       
-      const goalsData = await goalsResponse.json()
-      const achievementsData = await achievementsResponse.json()
+     
       const statsData = await statsResponse.json()
       const preferencesData = await preferencesResponse.json()
       const moodTrendData = await moodTrendResponse.json()
@@ -161,20 +129,7 @@ const Profile = () => {
       const aiData = await aiResponse.json()
       const exerciseData = await exerciseResponse.json()
       
-      if (goalsData.success) {
-        setWellnessGoals(goalsData.goals || [])
-      } else {
-        console.error('Failed to fetch wellness goals:', goalsData.error)
-        setWellnessGoals([])
-      }
-      
-      if (achievementsData.success) {
-        setAchievements(achievementsData.achievements || [])
-      } else {
-        console.error('Failed to fetch achievements:', achievementsData.error)
-        setAchievements([])
-      }
-      
+    
       if (statsData.success) {
         // Transform backend stats object into frontend format
         const backendStats = statsData.stats || {}
@@ -257,8 +212,7 @@ const Profile = () => {
       }
     } catch (error) {
       console.error('Error fetching profile data:', error.message)
-      setWellnessGoals([])
-      setAchievements([])
+     
       setStats([])
       setRecentActivity([])
       setMoodTrend([])
@@ -298,107 +252,8 @@ const Profile = () => {
 
 
 
-  const updateGoal = async (goalId, newValue) => {
-    try {
-      const idToken = await user.getIdToken()
-      const response = await fetch(`${getApiBaseUrl()}/profile/wellness-goals`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ goalId, current: newValue })
-      })
-      
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        console.warn('Backend server not running')
-        return
-      }
-      
-      const data = await response.json()
-      if (data.success) {
-        setWellnessGoals(prev => 
-          prev.map(goal => 
-            goal.id === goalId 
-              ? { ...goal, current: Math.min(newValue, goal.target) }
-              : goal
-          )
-        )
-      } else {
-        console.error('Failed to update goal:', data.error)
-      }
-    } catch (error) {
-      console.error('Error updating goal:', error.message)
-    }
-  }
-
-  const addGoal = async () => {
-    try {
-      if (!newGoal.title.trim() || !newGoal.target) {
-        alert('Please fill in all required fields')
-        return
-      }
-
-      const idToken = await user.getIdToken()
-      const response = await fetch(`${getApiBaseUrl()}/profile/wellness-goals`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({
-          goals: [
-            ...wellnessGoals,
-            {
-              id: Date.now().toString(),
-              title: newGoal.title,
-              description: newGoal.description,
-              target: parseInt(newGoal.target),
-              current: 0,
-              unit: newGoal.unit,
-              priority: newGoal.priority,
-              icon: '🎯'
-            }
-          ]
-        })
-      })
-      
-      if (!response.ok) {
-        console.warn('Backend server not running')
-        return
-      }
-      
-      const data = await response.json()
-      if (data.success) {
-        setWellnessGoals(prev => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            title: newGoal.title,
-            description: newGoal.description,
-            target: parseInt(newGoal.target),
-            current: 0,
-            unit: newGoal.unit,
-            priority: newGoal.priority,
-            icon: '🎯'
-          }
-        ])
-        setNewGoal({
-          title: '',
-          description: '',
-          target: '',
-          unit: 'times',
-          priority: 'medium'
-        })
-        setShowAddGoalModal(false)
-      } else {
-        console.error('Failed to add goal:', data.error)
-      }
-    } catch (error) {
-      console.error('Error adding goal:', error.message)
-    }
-  }
+ 
+ 
 
   return (
     <div className="min-h-screen wellness-bg relative overflow-hidden">
@@ -503,9 +358,9 @@ const Profile = () => {
                 </span>
               </div>
             </div>
-            <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-wellness hover:shadow-wellness-lg">
+            {/* <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-wellness hover:shadow-wellness-lg">
               Edit Profile
-            </Button>
+            </Button> */}
           </div>
         </motion.div>
 
@@ -580,13 +435,6 @@ const Profile = () => {
                         <option value="month">This Month</option>
                         <option value="year">This Year</option>
                       </select>
-                      <button
-                        onClick={() => fetchProfileData()}
-                        className="text-sm text-emerald-600 hover:text-emerald-800 underline"
-                        disabled={isLoading}
-                      >
-                        Refresh
-                      </button>
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
@@ -721,325 +569,11 @@ const Profile = () => {
                 </div>
 
               </motion.div>
-            )}
-
-            {/* Goals Tab */}
-            {activeTab === 'goals' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-light text-slate-700">Wellness Goals</h3>
-                  <Button 
-                    onClick={() => setShowAddGoalModal(true)}
-                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-wellness hover:shadow-wellness-lg"
-                  >
-                    Add Goal
-                  </Button>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  {isLoading ? (
-                    <div className="col-span-full flex items-center justify-center py-12">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading goals...</p>
-                      </div>
-                    </div>
-                  ) : (
-                    wellnessGoals.map((goal) => (
-                    <div key={goal.id} className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                      <div className="flex items-center space-x-3 mb-4">
-                        <span className="text-2xl">{goal.icon}</span>
-                        <div>
-                          <h4 className="font-semibold text-slate-700">{goal.title}</h4>
-                          <p className="text-sm text-slate-600">{goal.target} {goal.unit} per week</p>
-                        </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-slate-600">Progress</span>
-                          <span className="font-medium">{goal.current}/{goal.target}</span>
-                        </div>
-                        <div className="w-full bg-slate-200 rounded-full h-3">
-                          <div
-                            className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-300"
-                            style={{ width: `${(goal.current / goal.target) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateGoal(goal.id, goal.current + 1)}
-                          disabled={goal.current >= goal.target}
-                          className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                        >
-                          +1
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateGoal(goal.id, Math.max(0, goal.current - 1))}
-                          className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                        >
-                          -1
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Achievements Tab */}
-            {activeTab === 'achievements' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <h3 className="text-xl font-light text-slate-700">Achievements</h3>
-                
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {isLoading ? (
-                    <div className="col-span-full flex items-center justify-center py-12">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading achievements...</p>
-                      </div>
-                    </div>
-                  ) : (
-                    achievements.map((achievement) => (
-                    <div
-                      key={achievement.id}
-                      className={`p-6 rounded-xl border-2 transition-all ${
-                        achievement.earned
-                          ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200'
-                          : 'bg-gray-50 border-gray-200 opacity-60'
-                      }`}
-                    >
-                      <div className="text-center">
-                        <div className={`text-4xl mb-3 ${achievement.earned ? '' : 'grayscale'}`}>
-                          {achievement.icon}
-                        </div>
-                        <h4 className="font-semibold text-gray-900 mb-2">{achievement.title}</h4>
-                        <p className="text-sm text-gray-600 mb-4">{achievement.description}</p>
-                        {achievement.earned ? (
-                          <div className="text-sm font-medium text-green-600">✓ Earned</div>
-                        ) : (
-                          <div className="text-sm text-gray-500">Not earned yet</div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Settings Tab */}
-            {activeTab === 'settings' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <h3 className="text-xl font-light text-slate-700">Settings</h3>
-                
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                    <h4 className="font-semibold text-slate-700 mb-4 flex items-center">
-                      <Globe className="w-5 h-5 mr-2" />
-                      Language & Region
-                    </h4>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-2">
-                          Language
-                        </label>
-                        <select
-                          value={preferences.language}
-                          onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
-                          className="w-full p-3 border border-emerald-200 rounded-2xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white/50"
-                        >
-                          <option value="en">English</option>
-                          <option value="es">Spanish</option>
-                          <option value="fr">French</option>
-                          <option value="de">German</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-6 border border-sky-100">
-                    <h4 className="font-semibold text-slate-700 mb-4 flex items-center">
-                      <Bell className="w-5 h-5 mr-2" />
-                      Notifications
-                    </h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-slate-700">Push Notifications</div>
-                          <div className="text-sm text-slate-600">Receive reminders and updates</div>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={preferences.notifications}
-                            onChange={(e) => setPreferences(prev => ({ ...prev, notifications: e.target.checked }))}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-6 border border-violet-100">
-                    <h4 className="font-semibold text-slate-700 mb-4">Privacy</h4>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-2">
-                          Profile Visibility
-                        </label>
-                        <select
-                          value={preferences.privacy}
-                          onChange={(e) => setPreferences(prev => ({ ...prev, privacy: e.target.value }))}
-                          className="w-full p-3 border border-violet-200 rounded-2xl focus:ring-2 focus:ring-violet-400 focus:border-transparent bg-white/50"
-                        >
-                          <option value="public">Public</option>
-                          <option value="friends">Friends Only</option>
-                          <option value="private">Private</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-3">
-                  <Button variant="outline" className="border-emerald-200 text-emerald-600 hover:bg-emerald-50">Reset to Defaults</Button>
-                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-wellness hover:shadow-wellness-lg">
-                    Save Changes
-                  </Button>
-                </div>
-              </motion.div>
-            )}
+            )}       
           </div>
         </div>
       </div>
-
-      {/* Add Goal Modal */}
-      {showAddGoalModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-md mx-4"
-          >
-            <h3 className="text-xl font-light text-slate-700 mb-6">Add New Goal</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">
-                  Goal Title *
-                </label>
-                <input
-                  type="text"
-                  value={newGoal.title}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full p-3 border border-emerald-200 rounded-2xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white/50"
-                  placeholder="e.g., Daily Meditation"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={newGoal.description}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  rows="3"
-                  placeholder="Describe your goal..."
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Target *
-                  </label>
-                  <input
-                    type="number"
-                    value={newGoal.target}
-                    onChange={(e) => setNewGoal(prev => ({ ...prev, target: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="10"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Unit
-                  </label>
-                  <select
-                    value={newGoal.unit}
-                    onChange={(e) => setNewGoal(prev => ({ ...prev, unit: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="times">times</option>
-                    <option value="minutes">minutes</option>
-                    <option value="hours">hours</option>
-                    <option value="days">days</option>
-                    <option value="sessions">sessions</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Priority
-                </label>
-                <select
-                  value={newGoal.priority}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, priority: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setShowAddGoalModal(false)}
-                className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={addGoal}
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-wellness hover:shadow-wellness-lg"
-              >
-                Add Goal
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   )
 }
-
 export default Profile

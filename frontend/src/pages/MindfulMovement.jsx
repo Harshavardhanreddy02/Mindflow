@@ -187,16 +187,7 @@ const MindfulMovement = () => {
       bgColor: 'from-sky-50 to-cyan-50',
       borderColor: 'border-sky-200'
     },
-    {
-      id: 'coming_soon_mental',
-      name: 'Coming Soon',
-      description: 'New mindfulness practices coming soon!',
-      icon: '🚀',
-      color: 'from-emerald-400 to-teal-500',
-      bgColor: 'from-emerald-50 to-teal-50',
-      borderColor: 'border-emerald-200',
-      isComingSoon: true
-    }
+   
   ]
 
   // Physical wellness activities
@@ -220,17 +211,6 @@ const MindfulMovement = () => {
       bgColor: 'from-orange-50 to-red-50',
       borderColor: 'border-orange-200',
       type: 'rep'
-    },
-    {
-      id: 'coming_soon',
-      name: 'Coming Soon',
-      description: 'New exercises coming soon!',
-      icon: '🚀',
-      color: 'from-emerald-400 to-teal-500',
-      bgColor: 'from-emerald-50 to-teal-50',
-      borderColor: 'border-emerald-200',
-      type: 'coming_soon',
-      isComingSoon: true
     }
   ]
 

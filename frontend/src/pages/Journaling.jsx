@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button'
 import AudioRecorder from '../components/ui/AudioRecorder'
 import Navbar from '../components/Navbar'
 import { getApiBaseUrl } from '../utils/config'
-import speechService from '../services/speechService.js'
+// import speechService from '../services/speechService.js'
 // import languageService from '../services/languageService.js'
 import { 
   Mic, MicOff, Save, Calendar, BarChart3, PenTool, Cloud, Leaf, Sparkles,
@@ -177,20 +177,20 @@ const Journaling = () => {
   }, [user]);
 
   // Load supported languages for speech-to-text
-  useEffect(() => {
-    const loadSupportedLanguages = async () => {
-      try {
-        const languages = await speechService.getSupportedLanguages(authToken)
-        setSupportedLanguages(languages)
-      } catch (error) {
-        console.error('Error loading supported languages:', error)
-      }
-    }
+  // useEffect(() => {
+  //   const loadSupportedLanguages = async () => {
+  //     try {
+  //       const languages = await speechService.getSupportedLanguages(authToken)
+  //       setSupportedLanguages(languages)
+  //     } catch (error) {
+  //       console.error('Error loading supported languages:', error)
+  //     }
+  //   }
     
-    if (authToken) {
-      loadSupportedLanguages()
-    }
-  }, [authToken])
+  //   if (authToken) {
+  //     loadSupportedLanguages()
+  //   }
+  // }, [authToken])
 
   // Handle edit mode when navigating from detail page
   useEffect(() => {
@@ -297,37 +297,7 @@ const Journaling = () => {
     )
   }
 
-  // Enhanced speech-to-text functions
-  // const handleRecordingComplete = async () => {
-  //   setRecordingStatus('Recording completed. Click transcribe to convert to text.')
-    
-  //   // Don't automatically transcribe - let user choose when to transcribe
-  //   // The AudioRecorder will handle transcription when user clicks the transcribe button
-  // }
-
-  // const handleTranscriptionComplete = async (result) => {
-  //   if (result.success) {
-  //     setTranscription(result.text)
-  //     setRecordingStatus(`Transcribed with ${Math.round(result.confidence * 100)}% confidence`)
-      
-  //     // Auto-analyze mood from transcription
-  //     if (result.text.trim()) {
-  //       try {
-  //         await languageService.analyzeJournalMood(result.text, authToken)
-  //         // You could update mood tags here if needed
-  //       } catch (error) {
-  //         console.error('Mood analysis error:', error)
-  //       }
-  //     }
-  //   } else {
-  //     setRecordingStatus(`Transcription failed: ${result.error}`)
-  //   }
-  // }
-
-  // const handleRecordingError = (error) => {
-  //   console.error('Recording error:', error)
-  //   setRecordingStatus(`Recording error: ${error.message}`)
-  // }
+ 
   
   // AI Analysis Functions
   const analyzeEntry = async (entryText) => {
@@ -929,111 +899,6 @@ const Journaling = () => {
                           </div>
                       </div>
               </div>
-
-              {/* Enhanced Voice Input */}
-             {/*
-<div className="space-y-4">
-  <div className="flex items-center justify-between">
-    <div>
-      <label className="block text-lg font-semibold text-slate-800 mb-2">
-        Voice to Text
-      </label>
-      <p className="text-sm text-slate-600">
-        Record your thoughts and they'll be transcribed using Google Cloud Speech-to-Text
-      </p>
-    </div>
-    
-    <div className="flex items-center space-x-2">
-      <Languages className="w-4 h-4 text-slate-500" />
-      <select
-        value={selectedLanguage}
-        onChange={(e) => setSelectedLanguage(e.target.value)}
-        className="text-sm border border-slate-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {supportedLanguages.map(lang => (
-          <option key={lang} value={lang}>{lang}</option>
-        ))}
-      </select>
-    </div>
-  </div>
-
-  <AudioRecorder
-    onRecordingComplete={handleRecordingComplete}
-    onTranscriptionComplete={handleTranscriptionComplete}
-    onError={handleRecordingError}
-    maxDuration={300}
-    showWaveform={true}
-    className="bg-white p-4 rounded-lg border border-slate-200"
-    authToken={authToken}
-  />
-
-  {transcription && (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="font-medium text-blue-800">Transcription</h4>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() =>
-              setCurrentEntry(prev => prev + (prev ? ' ' : '') + transcription)
-            }
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-          >
-            Add to Entry
-          </button>
-          <button
-            onClick={() => setTranscription('')}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            Clear
-          </button>
-        </div>
-      </div>
-      <p className="text-blue-700 text-sm">{transcription}</p>
-    </div>
-  )}
-
-  <div className="flex items-center space-x-4 text-sm text-slate-600">
-    <label className="flex items-center space-x-2">
-      <input
-        type="checkbox"
-        checked={speechSettings.enablePunctuation}
-        onChange={(e) =>
-          setSpeechSettings(prev => ({
-            ...prev,
-            enablePunctuation: e.target.checked
-          }))
-        }
-        className="rounded"
-      />
-      <span>Auto-punctuation</span>
-    </label>
-  </div>
-
-  {recordingStatus && (
-    <div
-      className={`flex items-center space-x-2 text-sm ${
-        recordingStatus.includes('Error') ||
-        recordingStatus.includes('failed')
-          ? 'text-red-600'
-          : recordingStatus.includes('Transcribed')
-          ? 'text-green-600'
-          : 'text-blue-600'
-      }`}
-    >
-      {recordingStatus.includes('Error') ||
-      recordingStatus.includes('failed') ? (
-        <AlertCircle className="w-4 h-4" />
-      ) : recordingStatus.includes('Transcribed') ? (
-        <CheckCircle className="w-4 h-4" />
-      ) : (
-        <Clock className="w-4 h-4" />
-      )}
-      <span>{recordingStatus}</span>
-    </div>
-  )}
-</div>
-*/}
-
 
                     {/* Action Buttons */}
                     <div className="flex justify-between items-center pt-6 border-t border-slate-200">

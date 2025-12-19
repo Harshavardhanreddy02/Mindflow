@@ -84,10 +84,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API routes - Mount auth routes with /api/auth prefix
+// API routes
 app.use("/api/auth", authRoutes);
-
-// Mount other routes with their respective prefixes
 app.use("/api/journal", authMiddleware, journalRoutes);
 app.use("/api/community-forums", authMiddleware, communityForumRoutes);
 app.use("/api/ai", authMiddleware, aiRoutes);
