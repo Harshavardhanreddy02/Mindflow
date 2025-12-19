@@ -191,28 +191,28 @@ const MindfulMovement = () => {
   ]
 
   // Physical wellness activities
-  const physicalActivities = [
-    {
-      id: 'bicep_curl',
-      name: 'Bicep Curls',
-      description: 'Upper arm strength training',
-      icon: '💪',
-      color: 'from-rose-400 to-pink-500',
-      bgColor: 'from-rose-50 to-pink-50',
-      borderColor: 'border-rose-200',
-      type: 'rep'
-    },
-    {
-      id: 'squat',
-      name: 'Squats',
-      description: 'Lower body strength and endurance',
-      icon: '🦵',
-      color: 'from-orange-400 to-red-500',
-      bgColor: 'from-orange-50 to-red-50',
-      borderColor: 'border-orange-200',
-      type: 'rep'
-    }
-  ]
+  // const physicalActivities = [
+  //   {
+  //     id: 'bicep_curl',
+  //     name: 'Bicep Curls',
+  //     description: 'Upper arm strength training',
+  //     icon: '💪',
+  //     color: 'from-rose-400 to-pink-500',
+  //     bgColor: 'from-rose-50 to-pink-50',
+  //     borderColor: 'border-rose-200',
+  //     type: 'rep'
+  //   },
+  //   {
+  //     id: 'squat',
+  //     name: 'Squats',
+  //     description: 'Lower body strength and endurance',
+  //     icon: '🦵',
+  //     color: 'from-orange-400 to-red-500',
+  //     bgColor: 'from-orange-50 to-red-50',
+  //     borderColor: 'border-orange-200',
+  //     type: 'rep'
+  //   }
+  // ]
 
   // Camera management functions
   const startCamera = async () => {
@@ -1093,25 +1093,7 @@ const MindfulMovement = () => {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-white/90 backdrop-blur-sm rounded-3xl p-12 shadow-wellness hover:shadow-wellness-lg transition-all duration-500 cursor-pointer border border-emerald-100 hover:border-emerald-200"
-                onClick={() => setSelectedCategory('physical')}
-              >
-                <div className="text-center space-y-6">
-                  <div className="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-lg">
-                    <Heart className="w-12 h-12 text-white" />
-                  </div>
-                  <h3 className="text-3xl font-light text-slate-700">Physical Wellness</h3>
-                  <p className="text-slate-500 font-light leading-relaxed text-lg">
-                    Gentle movement, stretching, and body awareness
-                  </p>
-                </div>
-              </motion.div>
+              
             </div>
           </div>
         )}
@@ -1696,29 +1678,30 @@ const MindfulMovement = () => {
                       </div>
                   ) : (
                     // Physical wellness: Reps only, no difficulty levels
-                      <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-3">
-                          Target Repetitions
-                        </label>
-                        <select
-                          value={activitySettings.targetReps}
-                          onChange={(e) => setActivitySettings(prev => ({ ...prev, targetReps: parseInt(e.target.value) }))}
-                          className="w-full p-4 border border-emerald-200 rounded-2xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white text-slate-700"
-                        >
-                        <option value={1}>1 rep</option>
-                          <option value={5}>5 reps</option>
-                          <option value={10}>10 reps</option>
-                          <option value={15}>15 reps</option>
-                          <option value={20}>20 reps</option>
-                          <option value={25}>25 reps</option>
-                          <option value={30}>30 reps</option>
-                        <option value={40}>40 reps</option>
-                        <option value={50}>50 reps</option>
-                        </select>
-                      <p className="text-xs text-slate-500 mt-2">
-                        Choose how many repetitions you'd like to complete
-                      </p>
-                      </div>
+                    <></>
+                      // <div>
+                      //   <label className="block text-sm font-medium text-slate-600 mb-3">
+                      //     Target Repetitions
+                      //   </label>
+                      //   <select
+                      //     value={activitySettings.targetReps}
+                      //     onChange={(e) => setActivitySettings(prev => ({ ...prev, targetReps: parseInt(e.target.value) }))}
+                      //     className="w-full p-4 border border-emerald-200 rounded-2xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white text-slate-700"
+                      //   >
+                      //   <option value={1}>1 rep</option>
+                      //     <option value={5}>5 reps</option>
+                      //     <option value={10}>10 reps</option>
+                      //     <option value={15}>15 reps</option>
+                      //     <option value={20}>20 reps</option>
+                      //     <option value={25}>25 reps</option>
+                      //     <option value={30}>30 reps</option>
+                      //   <option value={40}>40 reps</option>
+                      //   <option value={50}>50 reps</option>
+                      //   </select>
+                      // <p className="text-xs text-slate-500 mt-2">
+                      //   Choose how many repetitions you'd like to complete
+                      // </p>
+                      // </div>
                   )}
                 </div>
 

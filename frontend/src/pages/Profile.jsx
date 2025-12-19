@@ -22,7 +22,6 @@ const Profile = () => {
   const [activityDistribution, setActivityDistribution] = useState({})
   const [journalEntries, setJournalEntries] = useState([])
   const [aiConversations, setAiConversations] = useState([])
-  const [exerciseSessions, setExerciseSessions] = useState([])
   const [selectedPeriod, setSelectedPeriod] = useState('week')
 
   const tabs = [
@@ -88,36 +87,21 @@ const Profile = () => {
       })
       
       // Fetch exercise sessions for wellness calculation
-      const exerciseResponse = await fetch(`${getApiBaseUrl()}/profile/exercise-sessions`, {
-        headers: {
-          'Authorization': `Bearer ${idToken}`
-        }
-      })
+     
       
       // Check if any response failed
       if ( !statsResponse.ok || !preferencesResponse.ok || 
-          !moodTrendResponse.ok || !activityDistributionResponse.ok || !recentActivityResponse.ok || !journalResponse.ok || !aiResponse.ok || !exerciseResponse.ok) {
+          !moodTrendResponse.ok || !activityDistributionResponse.ok || !recentActivityResponse.ok || !journalResponse.ok || !aiResponse.ok) {
         console.warn('Backend server not running')
         
         setStats([])
         setJournalEntries([])
         setAiConversations([])
-        setExerciseSessions([])
         setIsLoading(false)
         return
       }
       
-      // const contentType = goalsResponse.headers.get('content-type')
-      // if (!contentType || !contentType.includes('application/json')) {
-      //   console.warn('Backend server not running')
-
-      //   setStats([])
-      //   setRecentActivity([])
-      //   setMoodTrend([])
-      //   setActivityDistribution({})
-      //   setIsLoading(false)
-      //   return
-      // }
+  
       
      
       const statsData = await statsResponse.json()
@@ -127,7 +111,6 @@ const Profile = () => {
       const recentActivityData = await recentActivityResponse.json()
       const journalData = await journalResponse.json()
       const aiData = await aiResponse.json()
-      const exerciseData = await exerciseResponse.json()
       
     
       if (statsData.success) {
@@ -169,12 +152,7 @@ const Profile = () => {
       }
       
       // Process exercise sessions for wellness calculation
-      if (exerciseData.success) {
-        setExerciseSessions(exerciseData.sessions || [])
-      } else {
-        console.error('Failed to fetch exercise sessions:', exerciseData.error)
-        setExerciseSessions([])
-      }
+    
       
       if (preferencesData.success) {
         setPreferences(preferencesData.preferences || {
@@ -241,14 +219,9 @@ const Profile = () => {
         icon: <User className="w-6 h-6 text-white" />,
         color: 'from-green-500 to-green-600'
       },
-      {
-        label: 'Exercise Sessions',
-        value: `${exerciseSessions.length} exercises`,
-        icon: <Target className="w-6 h-6 text-white" />,
-        color: 'from-orange-500 to-red-600'
-      }
+     
     ])
-  }, [journalEntries, aiConversations, exerciseSessions])
+  }, [journalEntries, aiConversations])
 
 
 
@@ -439,59 +412,7 @@ const Profile = () => {
                   </div>
                   <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <div className="mb-3">
-                          <h4 className="font-semibold text-slate-700">Mood Trend</h4>
-                        </div>
-                        {isLoading ? (
-                          <div className="flex items-center justify-center h-20">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex items-end justify-between h-20 px-1">
-                              {moodTrend.length > 0 ? (
-                                moodTrend.map((height, index) => (
-                                  <div
-                                    key={index}
-                                    className="bg-gradient-to-t from-emerald-400 to-emerald-500 rounded-t transition-all duration-300 flex-shrink-0"
-                                    style={{ height: `${Math.max(height * 8, 8)}px`, width: '20px' }}
-                                    title={`Day ${index + 1}: Mood ${height}/10`}
-                                  />
-                                ))
-                              ) : (
-                                // Show default bars when no data
-                                [5, 5, 5, 5, 5, 5, 5].map((height, index) => (
-                                  <div
-                                    key={index}
-                                    className="bg-gradient-to-t from-gray-300 to-gray-400 rounded-t flex-shrink-0"
-                                    style={{ height: `${height * 8}px`, width: '20px' }}
-                                    title={`No mood data for day ${index + 1}`}
-                                  />
-                                ))
-                              )}
-                            </div>
-                            <div className="flex justify-between text-xs text-gray-500 mt-2 px-1">
-                              <span className="flex-shrink-0">Mon</span>
-                              <span className="flex-shrink-0">Tue</span>
-                              <span className="flex-shrink-0">Wed</span>
-                              <span className="flex-shrink-0">Thu</span>
-                              <span className="flex-shrink-0">Fri</span>
-                              <span className="flex-shrink-0">Sat</span>
-                              <span className="flex-shrink-0">Sun</span>
-                            </div>
-                            {moodTrend.length > 0 ? (
-                              <div className="text-xs text-gray-400 mt-2 text-center">
-                                Based on {moodTrend.filter(m => m !== 5).length} days with journal entries
-                              </div>
-                            ) : (
-                              <div className="text-xs text-gray-400 mt-2 text-center">
-                                No mood data available. Write journal entries to see your mood trend!
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
+                      
                       <div>
                         <h4 className="font-semibold text-slate-700 mb-3">Activity Distribution</h4>
                         <div className="space-y-2">
@@ -510,14 +431,7 @@ const Profile = () => {
                           <div className="w-full bg-slate-200 rounded-full h-2">
                             <div className="bg-teal-500 h-2 rounded-full" style={{ width: `${activityDistribution.journaling || 0}%` }}></div>
                           </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">Exercise Sessions</span>
-                            <span className="text-sm font-medium">{activityDistribution.exerciseSessions || 0}%</span>
-                          </div>
-                          <div className="w-full bg-slate-200 rounded-full h-2">
-                            <div className="bg-rose-500 h-2 rounded-full" style={{ width: `${activityDistribution.exerciseSessions || 0}%` }}></div>
-                          </div>
+                                                  
                         </div>
                       </div>
                     </div>
